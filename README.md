@@ -1,4 +1,4 @@
-# Airfaire_Intelligence_System
+# World Cup 2026 Airfare Intelligence & Recommendation System
 
 # 1. Project Overview
 ⚽ **The FIFA World Cup 2026** will bring millions of international fans traveling across the United States, Mexico, and Canada, creating major surges in flight demand and airfare prices.
