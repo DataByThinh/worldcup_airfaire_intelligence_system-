@@ -1,0 +1,17 @@
+# virtual environment
+venv/
+
+# environment variables
+.env
+
+# python cache
+__pycache__/
+
+# data
+data/raw/
+
+# logs
+logs/
+
+# csv
+*.csv
