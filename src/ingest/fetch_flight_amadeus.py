@@ -45,16 +45,16 @@ class Route:
 
 ROUTES = [
 
-    Route("CHI", "JFK", "Chicago", "New York", "United States", "United States"),
-    Route("CHI", "ATL", "Chicago", "Atlanta", "United States", "United States"),
+    Route("CHI", "JFK", "Chicago", "New York", "United States", "United States"), 
+    Route("CHI", "ATL", "Chicago", "Atlanta", "United States", "United States"), 
 
-    Route("MIA", "JFK", "Miami", "New York", "United States", "United States"),
+    Route("MIA", "JFK", "Miami", "New York", "United States", "United States"), 
 
     Route("SEA", "LAX", "Seattle", "Los Angeles", "United States", "United States"),
 
-    Route("BOS", "JFK", "Boston", "New York", "United States", "United States"),
+    Route("BOS", "JFK", "Boston", "New York", "United States", "United States"), 
 
-    Route("LAX", "JFK", "Los Angeles", "New York", "United States", "United States"),
+    Route("LAX", "JFK", "Los Angeles", "New York", "United States", "United States"), 
 ]
 
 DEPARTURE_DATES: list[str] = [
