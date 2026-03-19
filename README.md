@@ -1,9 +1,12 @@
 # World Cup 2026 Airfare Intelligence & Recommendation System
 
-# 1. Project Overview
-⚽ **The FIFA World Cup 2026** will bring millions of international fans traveling across the United States, Mexico, and Canada, creating major surges in flight demand and airfare prices.
+# 1. 🌍 Project Overview
+⚠️ Planning to watch the World Cup live? 
+— Airfare prices may spike before kickoff 
 
-This project builds an **Airfare Intelligence System** that analyzes flight price dynamics and generates data-driven recommendations to help travelers book smarter.
+The **FIFA World Cup 2026** — hosted across the United States, Mexico, and Canada, is one of the largest global sporting events, attracting millions of international travelers and creating significant spikes in airfare demand.
+
+This project collects real-world flight pricing data and applies time-series analysis to identify airfare surges and optimal booking windows, helping travelers make smarter booking decisions. 
 
 ## 1.1 Project Goal 
 🎯 The goal of this project is to use airfare data to generate insights that help travelers make smarter booking decisions during the FIFA World Cup 2026. Specifically, the system aims to:
