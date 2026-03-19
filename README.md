@@ -22,8 +22,8 @@ This project collects real-world flight pricing data and applies time-series ana
 - How can we recommend smarter travel options for soccer fans?
 
 # 2. Data Sources
-### **Flight Price Data**
-🗄️ Real-world airfare data collected via the **Amadeus Flight Offers API**, including: 
+### 🗄️**Flight Price Data**
+Real-world airfare data collected via the **Amadeus Flight Offers API**, including: 
 
 - `search_timestamp` – time when the flight price was queried
 - `search_date` – date of the price search
@@ -39,3 +39,7 @@ This project collects real-world flight pricing data and applies time-series ana
 - `departure_date` – flight departure date
 - `days_before_departure` – booking lead time
  <img width="10000" height="500" alt="image" src="https://github.com/user-attachments/assets/0677a636-200c-44d4-9c8d-b58e5c82df2a" />
+
+ # 3. System Architecture
+
+
