@@ -1,16 +1,21 @@
 import pandas as pd
 import os
 from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+
 
 # ==============================
 # 1. DATABASE CONNECTION
 # ==============================
 
-DB_USER = "postgres"                 # <-- username PostgreSQL
-DB_PASSWORD = "postgres123"        # <-- điền password bạn đặt khi cài PostgreSQL
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "worldcup_airfare_dw"      # <-- tên database bạn đã tạo
+load_dotenv()
+
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")      #database name in PostgreSQL
 
 connection_string = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -23,12 +28,12 @@ with engine.connect() as conn:
 
 
 # ==============================
-# 2. FOLDER CHỨA FILE CSV
+# 2. FOLDER STORES FILE CSV
 # ==============================
 
 folder_path = r"C:\Users\ASUS\OneDrive - University of Connecticut\Desktop\worldcup-airfaire-intelligence\src\ingest\data\bronze"
 
-# ↑ nếu folder khác thì sửa path này
+# Change path name if you store csv files in another folder
 
 
 # ==============================
@@ -43,7 +48,7 @@ for file in os.listdir(folder_path):
 
         path = os.path.join(folder_path, file)
 
-        print(f"📂 Reading file: {path}")
+        print(f" Reading file: {path}")
 
         df = pd.read_csv(path)
 
@@ -52,7 +57,7 @@ for file in os.listdir(folder_path):
 
 # kiểm tra có file không
 if len(all_data) == 0:
-    raise ValueError("❌ No CSV files found in the folder.")
+    raise ValueError(" No CSV files found in the folder.")
 
 
 # ==============================
