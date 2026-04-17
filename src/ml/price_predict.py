@@ -1,162 +1,353 @@
+import os
 import pandas as pd
-from sqlalchemy import create_engine
-
-import matplotlib
-matplotlib.use("Agg")   # PHẢI đặt trước pyplot
-
-import matplotlib.pyplot as plt
 import numpy as np
+from sqlalchemy import create_engine
+import matplotlib
+matplotlib.use("Agg", force=True)
+import matplotlib.pyplot as plt
 
+# =========================================================
+# 1. CONFIG
+# =========================================================
+EVENT_DATE = "2026-06-11"
+BOOKING_WINDOWS = [90, 30, 10, 1]
+
+OUTPUT_DIR = "outputs"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+#PostgreSQL connection
 engine = create_engine(
     "postgresql://postgres:postgres123@localhost:5432/worldcup_airfare_dw"
 )
 
-# Pull from your silver layer
-df = pd.read_sql("""
-    SELECT route, departure_date, search_date,
-           days_before_event, price_total,
-           airline_code, stops
+# =========================================================
+# 2. LOAD DATA
+# =========================================================
+query = f"""
+    SELECT
+        route,
+        departure_date,
+        search_date,
+        days_before_event,
+        price_total,
+        airline_code,
+        stops
     FROM silver.flight_prices_clean
-    WHERE departure_date IN ('2026-03-13','2026-05-12','2026-06-01','2026-06-10')
-""", engine)
+    WHERE departure_date = '{EVENT_DATE}'
+      AND days_before_event IN (90, 30, 10, 1)
+"""
 
-print("Data loaded successfully!")
+df = pd.read_sql(query, engine)
+
+print("=== RAW DATA LOADED ===")
 print(df.head())
-print(df.shape)
-
-
-
-#===============================
-# 1. QUICK DATA CHECK  
-#===============================
+print("Shape:", df.shape)
 print(df.info())
 print(df.isnull().sum())
 
-# Nếu có missing values thì bỏ tạm để train nhanh
+
+# =========================================================
+# 3. CLEAN DATA
+# =========================================================
 df = df.dropna().copy()
 
-# Optional: đảm bảo đúng kiểu dữ liệu ngày
 df["departure_date"] = pd.to_datetime(df["departure_date"])
 df["search_date"] = pd.to_datetime(df["search_date"])
+df["days_before_event"] = pd.to_numeric(df["days_before_event"], errors="coerce")
+df["price_total"] = pd.to_numeric(df["price_total"], errors="coerce")
+df["stops"] = pd.to_numeric(df["stops"], errors="coerce")
 
-# =========================
-# 2. Define features and target
-# =========================
-X = df[["days_before_event", "route", "airline_code", "stops"]].copy()
-y = df["price_total"].copy()
+df = df.dropna().copy()
 
-# =========================
-# 3. Encode categorical variables
-# =========================
-X = pd.get_dummies(X, columns=["route", "airline_code"], drop_first=False)
+# keep only exact windows again after coercion
+df = df[df["days_before_event"].isin(BOOKING_WINDOWS)].copy()
 
-print("Encoded feature shape:", X.shape)
-print(X.head())
+# Add booking window label
+window_label_map = {
+    90: "90 days before",
+    30: "30 days before",
+    10: "10 days before",
+    1: "1 day before"
+}
+df["booking_window"] = df["days_before_event"].map(window_label_map)
 
-# =========================
-# 4. Train / test split
-# =========================
-from sklearn.model_selection import train_test_split
+print("\n=== CLEANED DATA ===")
+print(df.head())
+print("Shape:", df.shape)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+# =========================================================
+# 4. BASIC CHECK: HOW MANY OFFERS BY ROUTE/WINDOW
+# =========================================================
+offer_check = (
+    df.groupby(["route", "days_before_event"], as_index=False)
+      .agg(
+          offer_count=("price_total", "count"),
+          avg_price=("price_total", "mean")
+      )
+      .sort_values(["route", "days_before_event"], ascending=[True, False])
 )
 
-print("X_train shape:", X_train.shape)
-print("X_test shape:", X_test.shape)
+print("\n=== OFFER CHECK ===")
+print(offer_check)
 
-# =========================
-# 5. Train XGBoost model
-# =========================
-from xgboost import XGBRegressor
-
-model = XGBRegressor(
-    n_estimators=200,
-    max_depth=5,
-    learning_rate=0.08,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    random_state=42
+offer_check.to_csv(
+    os.path.join(OUTPUT_DIR, "offer_check_route_window.csv"),
+    index=False
 )
 
-model.fit(X_train, y_train)
+# =========================================================
+# 5. ROUTE-LEVEL WINDOW ANALYSIS
+# Goal: for each route, which booking window is best?
+# =========================================================
+route_window_stats = (
+    df.groupby(["route", "days_before_event", "booking_window"], as_index=False)
+      .agg(
+          avg_price=("price_total", "mean"),
+          median_price=("price_total", "median"),
+          min_price=("price_total", "min"),
+          max_price=("price_total", "max"),
+          offer_count=("price_total", "count"),
+          price_std=("price_total", "std")
+      )
+)
 
-# =========================
-# 6. Evaluate model
-# =========================
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import numpy as np
+# Fill std NaN if only one record
+route_window_stats["price_std"] = route_window_stats["price_std"].fillna(0)
 
-y_pred = model.predict(X_test)
+print("\n=== ROUTE WINDOW STATS ===")
+print(route_window_stats)
 
-mae = mean_absolute_error(y_test, y_pred)
-rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-r2 = r2_score(y_test, y_pred)
+route_window_stats.to_csv(
+    os.path.join(OUTPUT_DIR, "route_window_stats.csv"),
+    index=False
+)
 
-print("\n=== Model Evaluation ===")
-print(f"MAE:  {mae:.2f}")
-print(f"RMSE: {rmse:.2f}")
-print(f"R²:   {r2:.4f}")
+# Best window per route based on lowest average price
+best_window_by_route = (
+    route_window_stats.sort_values(["route", "avg_price"], ascending=[True, True])
+    .groupby("route", as_index=False)
+    .first()
+    .rename(columns={
+        "days_before_event": "best_days_before_event",
+        "booking_window": "best_booking_window",
+        "avg_price": "best_window_avg_price",
+        "median_price": "best_window_median_price",
+        "min_price": "best_window_min_price",
+        "max_price": "best_window_max_price",
+        "offer_count": "best_window_offer_count",
+        "price_std": "best_window_price_std"
+    })
+)
 
+print("\n=== BEST WINDOW BY ROUTE ===")
+print(best_window_by_route)
 
-# =========================
-# 7. Generate a price curve
-# Example: BOS-JFK, UA, non-stop
-# =========================
-import numpy as np
-import matplotlib.pyplot as plt
+best_window_by_route.to_csv(
+    os.path.join(OUTPUT_DIR, "best_window_by_route.csv"),
+    index=False
+)
 
-days = np.arange(1, 91)
+# =========================================================
+# 6. AIRLINE ANALYSIS BY ROUTE + WINDOW
+# Goal: cheapest airline and most expensive airline
+# =========================================================
+airline_window_stats = (
+    df.groupby(["route", "days_before_event", "booking_window", "airline_code"], as_index=False)
+      .agg(
+          avg_price=("price_total", "mean"),
+          median_price=("price_total", "median"),
+          min_price=("price_total", "min"),
+          max_price=("price_total", "max"),
+          offer_count=("price_total", "count")
+      )
+)
 
-curve_df = pd.DataFrame({
-    "days_before_event": days,
-    "route": ["BOS-JFK"] * len(days),
-    "airline_code": ["UA"] * len(days),
-    "stops": [0] * len(days)
-})
+print("\n=== AIRLINE WINDOW STATS ===")
+print(airline_window_stats.head(20))
 
-curve_X = pd.get_dummies(curve_df, columns=["route", "airline_code"], drop_first=False)
+airline_window_stats.to_csv(
+    os.path.join(OUTPUT_DIR, "airline_window_stats.csv"),
+    index=False
+)
 
-# Align columns with training data
-curve_X = curve_X.reindex(columns=X.columns, fill_value=0)
+# Cheapest airline per route + booking window
+cheapest_airline = (
+    airline_window_stats.sort_values(
+        ["route", "days_before_event", "avg_price"],
+        ascending=[True, False, True]
+    )
+    .groupby(["route", "days_before_event"], as_index=False)
+    .first()
+    .rename(columns={
+        "booking_window": "window_label",
+        "airline_code": "cheapest_airline",
+        "avg_price": "cheapest_avg_price",
+        "median_price": "cheapest_median_price",
+        "min_price": "cheapest_min_price",
+        "max_price": "cheapest_max_price",
+        "offer_count": "cheapest_offer_count"
+    })
+)
 
-predicted_prices = model.predict(curve_X)
+# Most expensive airline per route + booking window
+most_expensive_airline = (
+    airline_window_stats.sort_values(
+        ["route", "days_before_event", "avg_price"],
+        ascending=[True, False, False]
+    )
+    .groupby(["route", "days_before_event"], as_index=False)
+    .first()
+    .rename(columns={
+        "booking_window": "window_label_exp",
+        "airline_code": "most_expensive_airline",
+        "avg_price": "most_expensive_avg_price",
+        "median_price": "most_expensive_median_price",
+        "min_price": "most_expensive_min_price",
+        "max_price": "most_expensive_max_price",
+        "offer_count": "most_expensive_offer_count"
+    })
+)
 
-best_day = days[np.argmin(predicted_prices)]
-best_price = predicted_prices.min()
+route_window_airline_summary = cheapest_airline.merge(
+    most_expensive_airline,
+    on=["route", "days_before_event"],
+    how="inner"
+)
 
-print("\n=== Price Curve Insight ===")
-print(f"Best day to book: {best_day} days before departure")
-print(f"Lowest predicted price: ${best_price:.2f}")
+# keep one window label
+route_window_airline_summary["booking_window"] = route_window_airline_summary["window_label"]
+route_window_airline_summary = route_window_airline_summary.drop(
+    columns=["window_label_exp", "window_label"]
+)
 
-plt.figure(figsize=(10, 5))
-plt.plot(days, predicted_prices)
-plt.xlabel("Days Before Departure")
-plt.ylabel("Predicted Price")
-plt.title("Predicted Price Curve")
-plt.gca().invert_xaxis()
-plt.grid(True)
+print("\n=== ROUTE + WINDOW + AIRLINE SUMMARY ===")
+print(route_window_airline_summary)
 
-plt.savefig("price_curve.png", dpi=300, bbox_inches="tight")
-plt.close()
+route_window_airline_summary.to_csv(
+    os.path.join(OUTPUT_DIR, "route_window_airline_summary.csv"),
+    index=False
+)
 
-print("Chart saved as price_curve.png")
+# =========================================================
+# 7. FINAL BUSINESS SUMMARY
+# Goal:
+# - best booking window for each route
+# - within that best window, cheapest and most expensive airline
+# =========================================================
+final_business_summary = best_window_by_route.merge(
+    route_window_airline_summary,
+    left_on=["route", "best_days_before_event"],
+    right_on=["route", "days_before_event"],
+    how="left"
+)
 
-curve_result = pd.DataFrame({
-    "days_before_departure": days,
-    "predicted_price": predicted_prices
-})
-#===============================
-print(curve_result.sort_values("days_before_departure"))
+print("\n=== FINAL BUSINESS SUMMARY ===")
+print(final_business_summary)
 
+final_business_summary.to_csv(
+    os.path.join(OUTPUT_DIR, "final_business_summary.csv"),
+    index=False
+)
 
-#===============================
-current_price = df['price_total'].iloc[-1]
+# =========================================================
+# 8. OPTIONAL: ROUTE-WINDOW HEATMAP-LIKE TABLE
+# =========================================================
+pivot_avg_price = route_window_stats.pivot_table(
+    index="route",
+    columns="days_before_event",
+    values="avg_price"
+)
 
-if current_price > best_price:
-    decision = "WAIT"
-else:
-    decision = "BUY"
+# reorder columns
+pivot_avg_price = pivot_avg_price.reindex(columns=[90, 30, 10, 1])
 
-print(f"\nRecommendation: {decision}")
+print("\n=== PIVOT AVG PRICE BY ROUTE / WINDOW ===")
+print(pivot_avg_price)
 
+pivot_avg_price.to_csv(
+    os.path.join(OUTPUT_DIR, "pivot_avg_price_by_route_window.csv")
+)
+
+# =========================================================
+# 9. CHARTS FOR EACH ROUTE
+# =========================================================
+unique_routes = sorted(df["route"].unique())
+
+for route_name in unique_routes:
+    plot_df = (
+        route_window_stats[route_window_stats["route"] == route_name]
+        .sort_values("days_before_event", ascending=False)
+    )
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(plot_df["days_before_event"], plot_df["avg_price"], marker="o")
+    plt.xlabel("Days Before Event")
+    plt.ylabel("Average Price")
+    plt.title(f"Average Price by Booking Window - {route_name}")
+    plt.grid(True)
+    plt.savefig(
+        os.path.join(OUTPUT_DIR, f"route_window_chart_{route_name}.png"),
+        dpi=300,
+        bbox_inches="tight"
+    )
+    plt.close()
+
+print("\nSaved route-level charts.")
+
+# =========================================================
+# 10. OPTIONAL: SCORE BOOKING WINDOWS
+# Lower price = better score
+# =========================================================
+# Route-level ranking of all 4 windows
+window_ranking = (
+    route_window_stats.sort_values(["route", "avg_price"], ascending=[True, True])
+    .groupby("route", group_keys=False)
+    .apply(lambda x: x.assign(window_rank=np.arange(1, len(x) + 1)))
+    .reset_index(drop=True)
+)
+
+print("\n=== WINDOW RANKING BY ROUTE ===")
+print(window_ranking)
+
+window_ranking.to_csv(
+    os.path.join(OUTPUT_DIR, "window_ranking_by_route.csv"),
+    index=False
+)
+
+# =========================================================
+# 11. CLEAN PRESENTATION TABLE
+# =========================================================
+presentation_table = final_business_summary[[
+    "route",
+    "best_days_before_event",
+    "best_booking_window",
+    "best_window_avg_price",
+    "cheapest_airline",
+    "cheapest_avg_price",
+    "most_expensive_airline",
+    "most_expensive_avg_price"
+]].sort_values("route")
+
+print("\n=== PRESENTATION TABLE ===")
+print(presentation_table)
+
+presentation_table.to_csv(
+    os.path.join(OUTPUT_DIR, "presentation_table.csv"),
+    index=False
+)
+
+# =========================================================
+# 12. DONE
+# =========================================================
+print("\n=== DONE ===")
+print("Generated files:")
+print("- outputs/offer_check_route_window.csv")
+print("- outputs/route_window_stats.csv")
+print("- outputs/best_window_by_route.csv")
+print("- outputs/airline_window_stats.csv")
+print("- outputs/route_window_airline_summary.csv")
+print("- outputs/final_business_summary.csv")
+print("- outputs/pivot_avg_price_by_route_window.csv")
+print("- outputs/window_ranking_by_route.csv")
+print("- outputs/presentation_table.csv")
+print("- outputs/route_window_chart_<route>.png")
