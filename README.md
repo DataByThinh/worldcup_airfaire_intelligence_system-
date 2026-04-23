@@ -1,29 +1,44 @@
-# World Cup 2026 Airfare Intelligence & Recommendation System
+# ✈️ World Cup 2026 — Airfare Intelligence & Recommendation System
+
+> **Buy now or wait?** A solo-built, end-to-end data system that converts raw flight data into clear booking decisions for FIFA World Cup 2026 travelers.
 
 # 1. Project Overview
-⚠️ Planning to watch the World Cup live? 
-— Airfare prices may spike before kickoff 
 
 🌍 The **FIFA World Cup 2026** — hosted across the United States, Mexico, and Canada, is one of the largest global sporting events, attracting millions of international travelers and creating significant spikes in airfare demand.
 
-This project collects real-world flight pricing data and applies time-series analysis to identify airfare surges and optimal booking windows, helping travelers make smarter booking decisions. 
+This project collects real-world flight pricing data and applies time-series analysis to identify airfare surges and optimal booking windows, helping travelers make smarter booking decisions within **United States**.
 
 ## 1.1 Project Goal 
-🎯 The goal of this project is to use airfare data to generate insights that help travelers make smarter booking decisions during the FIFA World Cup 2026. Specifically, the system aims to:
+Build a airfare intelligence system that helps soccer fans worldwide book smarter flights to the FIFA World Cup 2026. Specifically, the system aims to:
 
-- **Recommendation System**: Build a data-driven airfare recommendation system that helps soccer fans worldwide book smarter flights for the FIFA World Cup 2026
-- **Price Intelligence**: Identify airfare spikes and booking patterns around World Cup matches
-- **Smarter Travel Decisions**: Recommend optimal booking windows and alternative routes.
+- Recommendation System — Identify the optimal booking window per route based on historical price patterns
+- Price Intelligence — Detect airfare spikes and trend direction (rising / stable / falling) around match dates
+- Smarter Travel Decisions — Recommend the best timing and the most affordable airline per route
 
 ## 1.2 Business Questions 
-- How do airfare prices change before and during the FIFA World Cup?
-- Which routes experience the largest price increases?
-- When is the best time to book flights?
-- How can we recommend smarter travel options for soccer fans?
 
-# 2. Data Sources
-### 🗄️**Flight Price Data**
-Real-world airfare data collected via the **Amadeus Flight Offers API**, including: 
+- How do airfare prices change across the 90 → 30 → 10 → 1 day booking windows before World Cup matches?
+- When is the statistically best time to book flights to each host city?
+- Which airlines offer the most consistent value per route?
+- How can we translate price data into a clear, actionable recommendation for fans?
+
+---
+
+# 2. System Architecture
+<img width="1500" height="1000" alt="image" src="https://github.com/user-attachments/assets/e9706bdc-3422-4433-8b99-3e1fa0b440a3" />
+
+
+# 3. 🗄️Data Sources
+
+### **Flight Price Data**
+
+- **Primary Source**: Amadeus Flight Offers API  
+- **Data Type**: Real-time airfare pricing  
+- **Coverage**: Assgined Top Routes    
+- **Windows**: D-90 / D-30 / D-10 / D-1  
+
+Schema: `route`, `departure_date`, `search_date`, `price_total`, `airline_code`, `stops`
+
 
 - `search_timestamp` – time when the flight price was queried
 - `search_date` – date of the price search
