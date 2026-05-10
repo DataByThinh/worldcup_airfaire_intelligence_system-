@@ -55,6 +55,5 @@ Schema: `route`, `departure_date`, `search_date`, `price_total`, `airline_code`,
 - `days_before_departure` – booking lead time
  <img width="10000" height="500" alt="image" src="https://github.com/user-attachments/assets/0677a636-200c-44d4-9c8d-b58e5c82df2a" />
 
- # 3. System Architecture
 
 
