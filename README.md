@@ -12,12 +12,11 @@
 
 </div>
 
-
-
 > **What if you could predict airfare spikes before they happen — and tell travelers exactly when to book?**
 >
 > This system ingests real-time flight pricing data across multiple high-demand travel routes, processes it through a layered analytics pipeline, and delivers ML-driven booking recommendations through an interactive React dashboard.
-
+> 
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/eac0dea5-cacf-4751-8f99-591c5643c507" />
 
 ## 🧠 What This System Does
 
