@@ -195,7 +195,7 @@ Data Engineer/ Analytics Engineer/ Data Scientist
 
 <div align="center">
 
-*Built with ☕ and a lot of `pandas` DataFrames during the World Cup hype cycle.*
+"Built with ☕, curiosity, and too many browser tabs comparing flights"
 
 </div>
 
