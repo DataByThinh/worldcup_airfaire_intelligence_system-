@@ -2,12 +2,26 @@
 
 **A production-grade data pipeline, ML prediction engine, and booking intelligence platform built for the 2026 FIFA World Cup**
 
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://postgresql.org)
-[![React](https://img.shields.io/badge/React-Vite-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
-[![XGBoost](https://img.shields.io/badge/ML-XGBoost-orange?style=flat-square)](https://xgboost.readthedocs.io)
-[![Amadeus API](https://img.shields.io/badge/API-Amadeus-00439C?style=flat-square)](https://developers.amadeus.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+<p align="center">
+
+
+</p>
+
+<p align="center">
+
+<img src="https://img.shields.io/badge/Python-Data%20Engineering-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-Data%20Warehouse-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/React-Vite%20Dashboard-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+<img src="https://img.shields.io/badge/XGBoost-ML%20Prediction-orange?style=for-the-badge" />
+<img src="https://img.shields.io/badge/Amadeus-Live%20Flight%20API-00439C?style=for-the-badge" />
+
+</p>
+
+<p align="center">
+  <strong>Real-Time Airfare Intelligence for World Cup Travel</strong><br>
+ML-powered booking recommendations, route analytics, and fare trend prediction.
+
+</p>
 
 
 </div>
@@ -16,7 +30,7 @@
 >
 > This system ingests real-time flight pricing data across multiple high-demand travel routes, processes it through a layered analytics pipeline, and delivers ML-driven booking recommendations through an interactive React dashboard.
 > 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/eac0dea5-cacf-4751-8f99-591c5643c507" />
+<img src="worldcup-airfaire-intelligence.png" width="100%" />
 
 ## 🧠 What This System Does
 
@@ -131,40 +145,43 @@ Interactive React Dashboard
 
 ```
 worldcup-airfare-intelligence/
-├── etl/
-│   ├── ingest.py            # Amadeus API extraction
-│   ├── transform.py         # Bronze → Silver transformation
-│   └── run_pipeline.py      # Orchestration entrypoint
-├── dbt/
-│   ├── models/
-│   │   ├── bronze/          # Raw source models
-│   │   ├── silver/          # Cleaned + enriched
-│   │   └── gold/            # Analytics aggregates
-│   └── dbt_project.yml
-├── ml/
-│   ├── features.py          # Feature engineering from Gold layer
-│   ├── train_model.py       # XGBoost training + tuning
-│   ├── predict.py           # Inference interface
-│   └── recommend.py         # Booking recommendation logic
-├── api/
-│   ├── main.py              # FastAPI app
-│   └── routes/              # Endpoint definitions
-├── frontend/
+│
+├── README.md
+├── LICENSE
+├── .gitignore
+├── requirements.txt
+├── worldcup-airfaire-intelligence.png
+│
+├── data/
+│   └── ...                  # Raw and processed airfare datasets
+│
+├── src/
+│   ├── ingest/
+│   │   ├── fetch_flight_amadeus.py
+│   │   └── ...              # API ingestion and loading scripts
+│   │
+│   ├── ml/
+│   │   └── ...              # Fare prediction and forecasting models
+│   │
+│   ├── recommendation/
+│   │   └── ...              # Booking recommendation logic
+│   │
+│   └── ui/
+│       └── app.py           # Backend / dashboard integration logic
+│
+├── airfare-ui/
+│   ├── public/
+│   │   └── ...              # Static assets and icons
+│   │
 │   ├── src/
-│   │   ├── components/      # Dashboard components
-│   │   └── pages/           # Route explorer, heatmap, etc.
-│   └── vite.config.js
-├── sql/
-│   └── init_schema.sql      # PostgreSQL schema
-├── tests/
-│   └── test_pipeline.py
-├── docs/
-│   ├── architecture_diagram.png   ← add this
-│   ├── data_model.md
-│   └── api_reference.md
-├── .env.example
-├── docker-compose.yml
-└── README.md
+│   │   └── ...              # React dashboard components and pages
+│   │
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   └── index.html
+│
+└── .env                     # Local environment variables (ignored)
 ```
 ---
 
