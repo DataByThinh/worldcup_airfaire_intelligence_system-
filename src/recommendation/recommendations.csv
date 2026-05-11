@@ -1,0 +1,7 @@
+route,best_window_days,best_window_label,best_price,price_90day,price_1day,avg_price_all_windows,price_range_usd,cheapest_airline,cheapest_airline_price,most_expensive_airline,most_expensive_airline_price,recommendation,savings_vs_lastminute,savings_vs_early
+BOS-JFK,30,1 month out,209.69,467.69,236.1699981689453,293.65,258.0,9K,182.95,AS,307.87,Book ~30 days out for best value,26.48,258.0
+CHI-ATL,30,1 month out,282.52,501.85,335.2099914550781,367.09497,219.33002,B6,214.58,UA,318.47,Book ~30 days out for best value,52.69,219.33
+CHI-JFK,30,1 month out,116.53,482.46,184.35000610351562,242.95749,365.93,B6,116.53,B6,116.53,Book ~30 days out for best value,67.82,365.93
+LAX-JFK,30,1 month out,235.06,602.42,317.7799987792969,368.64502,367.36,B6,194.0,6X,441.22,Book ~30 days out for best value,82.72,367.36
+MIA-JFK,90,3 months out,145.97,145.97,,145.97,0.0,F9,145.97,F9,145.97,Prices are relatively stable — book when ready,,0.0
+SEA-LAX,30,1 month out,217.17,411.45,288.8699951171875,296.8325,194.28001,AS,149.43,UA,383.96,Book ~30 days out for best value,71.7,194.28

@@ -1,15 +1,3 @@
-"""
-World Cup Airfare Intelligence System
-======================================
-Portfolio project: ML-powered airfare prediction + recommendation engine
-for FIFA World Cup 2026.
-
-Author: [Your Name]
-Data: Snapshot-based PostgreSQL airfare data (4 booking windows)
-Model: XGBoost regression — price_total as target
-Output: Predicted prices + traveler recommendations per route
-"""
-
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine

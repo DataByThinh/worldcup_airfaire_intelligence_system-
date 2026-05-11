@@ -1,0 +1,22 @@
+route,days_before_event,window_label,avg_predicted,avg_actual,n_obs
+BOS-JFK,90,3 months out,467.69,463.78,115
+BOS-JFK,30,1 month out,209.69,212.77,161
+BOS-JFK,10,10 days out,261.05,261.46,173
+BOS-JFK,1,Last minute,236.17,235.88,156
+CHI-ATL,90,3 months out,501.85,510.02,91
+CHI-ATL,30,1 month out,282.52,276.86,85
+CHI-ATL,10,10 days out,348.8,349.44,105
+CHI-ATL,1,Last minute,335.21,335.99,98
+CHI-JFK,90,3 months out,482.46,483.14,60
+CHI-JFK,30,1 month out,116.53,117.35,24
+CHI-JFK,10,10 days out,188.49,186.37,24
+CHI-JFK,1,Last minute,184.35,182.77,24
+LAX-JFK,90,3 months out,602.42,601.68,136
+LAX-JFK,30,1 month out,235.06,235.52,144
+LAX-JFK,10,10 days out,319.32,319.71,134
+LAX-JFK,1,Last minute,317.78,317.03,117
+MIA-JFK,90,3 months out,145.97,141.58,6
+SEA-LAX,90,3 months out,411.45,408.72,111
+SEA-LAX,30,1 month out,217.17,214.09,123
+SEA-LAX,10,10 days out,269.84,270.35,142
+SEA-LAX,1,Last minute,288.87,290.68,130

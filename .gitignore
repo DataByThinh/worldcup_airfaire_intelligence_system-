@@ -1,17 +1,66 @@
-# virtual environment
+# =========================================
+# Ignore everything by default
+# =========================================
+*
+
+# =========================================
+# Keep root project files
+# =========================================
+!README.md
+!.gitignore
+!requirements.txt
+!LICENSE
+
+# =========================================
+# Keep image assets
+# =========================================
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+
+# =========================================
+# Keep backend / source code
+# =========================================
+!src/
+!src/**
+
+# =========================================
+# Keep frontend essentials
+# =========================================
+!airfare-ui/
+
+!airfare-ui/package.json
+!airfare-ui/package-lock.json
+!airfare-ui/index.html
+!airfare-ui/vite.config.js
+
+!airfare-ui/src/
+!airfare-ui/src/**
+
+!airfare-ui/public/
+!airfare-ui/public/**
+
+# =========================================
+# Keep data
+# =========================================
+!data/
+!data/**
+
+# =========================================
+# Ignore generated / sensitive files
+# =========================================
+.env
 venv/
 
-# environment variables
-.env
+.vscode/
 
-# python cache
-__pycache__/
+**/node_modules/
+**/__pycache__/
+**/*.pyc
 
-# data
-data/raw/
-
-# logs
-logs/
-
-# csv
-*.csv
+**/dist/
+**/build/
+airfare-ui/.gitignore
+airfare-ui/src/assets
+airfare-ui/README.md
