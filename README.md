@@ -1,59 +1,185 @@
-# ✈️ World Cup 2026 — Airfare Intelligence & Recommendation System
+# ✈️ World Cup Airfare Intelligence System
 
-> **Buy now or wait?** A solo-built, end-to-end data system that converts raw flight data into clear booking decisions for FIFA World Cup 2026 travelers.
+**A production-grade data pipeline, ML prediction engine, and booking intelligence platform built for the 2026 FIFA World Cup**
 
-# 1. Project Overview
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![React](https://img.shields.io/badge/React-Vite-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
+[![XGBoost](https://img.shields.io/badge/ML-XGBoost-orange?style=flat-square)](https://xgboost.readthedocs.io)
+[![Amadeus API](https://img.shields.io/badge/API-Amadeus-00439C?style=flat-square)](https://developers.amadeus.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-🌍 The **FIFA World Cup 2026** — hosted across the United States, Mexico, and Canada, is one of the largest global sporting events, attracting millions of international travelers and creating significant spikes in airfare demand.
 
-This project collects real-world flight pricing data and applies time-series analysis to identify airfare surges and optimal booking windows, helping travelers make smarter booking decisions within **United States**.
+</div>
 
-## 1.1 Project Goal 
-Build a airfare intelligence system that helps soccer fans worldwide book smarter flights to the FIFA World Cup 2026. Specifically, the system aims to:
 
-- Recommendation System — Identify the optimal booking window per route based on historical price patterns
-- Price Intelligence — Detect airfare spikes and trend direction (rising / stable / falling) around match dates
-- Smarter Travel Decisions — Recommend the best timing and the most affordable airline per route
 
-## 1.2 Business Questions 
+> **What if you could predict airfare spikes before they happen — and tell travelers exactly when to book?**
+>
+> This system ingests real-time flight pricing data across multiple high-demand travel routes, processes it through a layered analytics pipeline, and delivers ML-driven booking recommendations through an interactive React dashboard.
 
-- How do airfare prices change across the 90 → 30 → 10 → 1 day booking windows before World Cup matches?
-- When is the statistically best time to book flights to each host city?
-- Which airlines offer the most consistent value per route?
-- How can we translate price data into a clear, actionable recommendation for fans?
+
+## 🧠 What This System Does
+
+The system answers three core business questions:
+
+| Question | System Component |
+|---|---|
+| *What are flights costing right now?* | Real-time Amadeus ingestion pipeline |
+| *How will prices change in the next 30 days?* | XGBoost fare prediction model |
+| *Should I book now or wait?* | Rule-based + ML booking recommendation engine |
 
 ---
 
-# 2. System Architecture
-<img width="1500" height="1000" alt="image" src="https://github.com/user-attachments/assets/e9706bdc-3422-4433-8b99-3e1fa0b440a3" />
+## 🏗️ Architecture
+
+<img width="1500" height="850" alt="image" src="https://github.com/user-attachments/assets/e9706bdc-3422-4433-8b99-3e1fa0b440a3" />
 
 
-# 3. 🗄️Data Sources
+## 🔄 Data Pipeline: Bronze → Silver → Gold
 
-### **Flight Price Data**
+Built using a Bronze → Silver → Gold architecture inspired by modern analytics platforms.
 
-- **Primary Source**: Amadeus Flight Offers API  
-- **Data Type**: Real-time airfare pricing  
-- **Coverage**: Assgined Top Routes    
-- **Windows**: D-90 / D-30 / D-10 / D-1  
+🥉 **Bronze — Raw Ingestion**  
+Stores append-only API responses with full historical traceability.
 
-Schema: `route`, `departure_date`, `search_date`, `price_total`, `airline_code`, `stops`
+🥈 **Silver — Cleaned & Enriched**  
+Standardizes fares, removes duplicates, and engineers booking intelligence features.
+
+🥇 **Gold — Analytics & ML Ready**  
+Delivers aggregated pricing metrics and optimized datasets powering the dashboard, recommendation engine, and ML models.
+
+---
+
+## 🤖 ML Model: Fare Prediction & Booking Intelligence
+
+### Fare Prediction — XGBoost Regressor
+
+Predicts airfare prices for a given route, airline, and departure window, then converts those predictions into traveler-facing booking recommendations.
+
+**Feature set:**
+- Days before departure
+- Route
+- Airline code
+- Number of stops
+- Departure date and month
+- Flight duration
+- Search date timing
+- Historical route-level fare patterns
+
+**Training approach:**
+- Trained on collected airfare snapshots from the data pipeline
+- Uses engineered time-based and route-based features
+- Evaluated with regression metrics such as MAE and R²
+- Generates predicted fare movement to support booking decisions
+
+**Prediction outputs:**
+- Estimated airfare price
+- Route-level price trend
+- Buy now vs. wait recommendation
+- Cheaper alternative route signal
+
+```text
+Airfare Snapshots
+        ↓
+Feature Engineering
+        ↓
+XGBoost Regressor
+        ↓
+Fare Prediction
+        ↓
+Booking Recommendation
+```
 
 
-- `search_timestamp` – time when the flight price was queried
-- `search_date` – date of the price search
-- `origin` – departure airport code
-- `destination` – arrival airport code
-- `route` – flight route identifier
-- `origin_name`, `destination_name` – airport names
-- `origin_country`, `destination_country` – country information
-- `airline_code` – airline operating the flight
-- `stops` – number of layovers
-- `price_total` – total ticket price
-- `currency` – price currency
-- `departure_date` – flight departure date
-- `days_before_departure` – booking lead time
- <img width="10000" height="500" alt="image" src="https://github.com/user-attachments/assets/0677a636-200c-44d4-9c8d-b58e5c82df2a" />
+### Booking Recommendation Engine
 
+Combines airfare predictions with route-level pricing signals to generate simple traveler-facing booking recommendations.
 
+| Recommendation | Logic |
+|---|---|
+| **Book Now** | Current fare is relatively low and predicted prices are increasing |
+| **Wait** | Current fare appears expensive and predicted prices remain stable or decline |
+| **Monitor** | Price trend is unclear or route volatility is moderate |
+| **Consider Alternative Route** | Similar nearby routes show lower predicted fares |
+
+---
+
+## 📊 Dashboard
+
+Built with **React + Vite** to surface real-time airfare intelligence through interactive analytics and booking insights.
+
+### Core Views
+
+| View | Description |
+|---|---|
+| 🌍 **Route Explorer** | Compare live airfare trends across travel routes |
+| 📈 **Fare Prediction** | Visualize projected airfare movement and pricing trends |
+| 🧠 **Booking Signal** | ML-driven recommendation engine for booking decisions |
+| 🔎 **Route Intelligence** | Discover lower-cost and alternative route options |
+
+```text
+Real-Time Flight Data
+          ↓
+Analytics Pipeline
+          ↓
+ML Prediction Engine
+          ↓
+Interactive React Dashboard
+```
+
+## 📁 Project Structure
+
+```
+worldcup-airfare-intelligence/
+├── etl/
+│   ├── ingest.py            # Amadeus API extraction
+│   ├── transform.py         # Bronze → Silver transformation
+│   └── run_pipeline.py      # Orchestration entrypoint
+├── dbt/
+│   ├── models/
+│   │   ├── bronze/          # Raw source models
+│   │   ├── silver/          # Cleaned + enriched
+│   │   └── gold/            # Analytics aggregates
+│   └── dbt_project.yml
+├── ml/
+│   ├── features.py          # Feature engineering from Gold layer
+│   ├── train_model.py       # XGBoost training + tuning
+│   ├── predict.py           # Inference interface
+│   └── recommend.py         # Booking recommendation logic
+├── api/
+│   ├── main.py              # FastAPI app
+│   └── routes/              # Endpoint definitions
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # Dashboard components
+│   │   └── pages/           # Route explorer, heatmap, etc.
+│   └── vite.config.js
+├── sql/
+│   └── init_schema.sql      # PostgreSQL schema
+├── tests/
+│   └── test_pipeline.py
+├── docs/
+│   ├── architecture_diagram.png   ← add this
+│   ├── data_model.md
+│   └── api_reference.md
+├── .env.example
+├── docker-compose.yml
+└── README.md
+```
+---
+
+## 👤 Author
+
+**Thinh Nguyen**
+
+Data Engineer/ Analytics Engineer/ Data Scientist
+
+---
+
+<div align="center">
+
+*Built with ☕ and a lot of `pandas` DataFrames during the World Cup hype cycle.*
+
+</div>
 
