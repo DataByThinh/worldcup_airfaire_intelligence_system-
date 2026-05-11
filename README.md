@@ -1,7 +1,5 @@
 # ✈️ World Cup Airfare Intelligence System
 
-**A production-grade data pipeline, ML prediction engine, and booking intelligence platform built for the 2026 FIFA World Cup**
-
 <p align="center">
 
 
@@ -14,6 +12,8 @@
 <img src="https://img.shields.io/badge/React-Vite%20Dashboard-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
 <img src="https://img.shields.io/badge/XGBoost-ML%20Prediction-orange?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Amadeus-Live%20Flight%20API-00439C?style=for-the-badge" />
+<img src="https://img.shields.io/badge/scikit--learn-ML%20Pipeline-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-Backend%20API-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
 
 </p>
 
